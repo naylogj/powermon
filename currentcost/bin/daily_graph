@@ -1,0 +1,43 @@
+#!/bin/bash
+# Script to produce a graph of the last day
+# of Electricity consumption
+
+# Change Variables to reflect your environment
+
+WEBROOT=/var/www
+DATADIR=/home/pi/currentcost/data
+
+# Create Graph in the $WEBROOT/graphs directory
+
+cd $DATADIR
+rrdtool graph /$WEBROOT/graphs/last_day.png \
+--start end-1d --width 800 --end now --slope-mode \
+--vertical-label Watts --lower-limit 0 \
+--height 450 \
+--alt-autoscale-max \
+DEF:Power=powertemp.rrd:Power:AVERAGE:step=6 \
+DEF:PowerMin=powertemp.rrd:Power:MIN:step=6 \
+DEF:PowerMax=powertemp.rrd:Power:MAX:step=6 \
+CDEF:PowerRange=PowerMax,PowerMin,- \
+CDEF:LoadFactor=Power,PowerMax,/,100,* \
+LINE1:PowerMin: \
+AREA:PowerRange#0000FF11:"Error Range":STACK \
+LINE1:PowerMin#0000FF33:"Min" \
+LINE1:PowerMax#0000FF33:"Max" \
+LINE1:Power#0000FF:"Average" \
+LINE2:LoadFactor#FF0000:"Load Factor"
+
+# Optionally create JSON ish format output in the $WEBROOT/data directory
+
+cd $DATADIR
+rrdtool xport --start end-1d --end now --maxrows 800 --json --enumds \
+DEF:Power=powertemp.rrd:Power:AVERAGE:step=6 \
+DEF:PowerMin=powertemp.rrd:Power:MIN:step=6 \
+DEF:PowerMax=powertemp.rrd:Power:MAX:step=6 \
+CDEF:PowerRange=PowerMax,PowerMin,- \
+CDEF:LoadFactor=Power,PowerMax,/,100,* \
+XPORT:Power:"Average Power" \
+XPORT:PowerMin:"Minimum Power" \
+XPORT:PowerMax:"Maximum Power" \
+XPORT:PowerRange:"Power Range" \
+XPORT:LoadFactor:"Load Factor" |sed -e "s/'/\"/g" -e 's/, /],[/g' > /$WEBROOT/data/last_day.json

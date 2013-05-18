@@ -1,0 +1,20 @@
+#!/bin/bash
+# Script to start the data collection
+# Python code
+
+# Change Variables to reflect your environment
+# note this srcript is run by root normally
+# using "sudo /etc/init.d/powermon start"
+
+BINDIR=/home/pi/currentcost/bin
+
+cd /$BINDIR
+
+echo
+nohup /$BINDIR/get_data_rrd.py & 
+
+echo
+echo "... Starting energy collection deamon"
+echo
+
+exit 0

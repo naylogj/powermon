@@ -1,0 +1,26 @@
+#!/bin/bash
+# Script to produce a graph of the last 10 minutes
+# of Electricity consumption
+
+# Change Variables to reflect your environment
+
+WEBROOT=/var/www
+DATADIR=/home/pi/currentcost/data
+
+# Create Graph in the $WEBROOT/graphs directory
+
+cd $DATADIR
+rrdtool graph /$WEBROOT/graphs/last_10min.png \
+--start end-10m --width 800 --end now --slope-mode \
+--vertical-label Watts --lower-limit 0 \
+--height 450 \
+--alt-autoscale-max \
+DEF:Power=powertemp.rrd:Power:MAX:step=6 \
+LINE1:Power#0000FF:"Max"
+
+# Optionally create JSON ish format output in the $WEBROOT/data directory
+
+cd $DATADIR
+rrdtool xport --start end-10m --end now --maxrows 800 --json --enumds \
+DEF:PowerMAX=powertemp.rrd:Power:MAX:step=6 \
+XPORT:PowerMAX:"Maximum Power" |sed -e "s/'/\"/g" -e 's/, /],[/g' > /$WEBROOT/data/last_10min.json

@@ -1,0 +1,39 @@
+#!/bin/bash
+# Script to produce a graph of the last week
+# of Electricity consumption
+
+# Change Variables to reflect your environment
+
+WEBROOT=/var/www
+DATADIR=/home/pi/currentcost/data
+
+# Create Graph in the $WEBROOT/graphs directory
+
+cd $DATADIR
+rrdtool graph /$WEBROOT/graphs/last_week.png \
+--start end-7d --width 800 --end now --slope-mode \
+--vertical-label Watts --lower-limit 0 \
+--height 450 \
+--alt-autoscale-max \
+DEF:Power=powertemp.rrd:Power:AVERAGE:step=6 \
+DEF:PowerMin=powertemp.rrd:Power:MIN:step=6 \
+DEF:PowerMax=powertemp.rrd:Power:MAX:step=6 \
+CDEF:PowerRange=PowerMax,PowerMin,- \
+LINE1:PowerMin: \
+AREA:PowerRange#FF00FF11:"Error Range":STACK \
+LINE1:PowerMin#0000FF33:"Min" \
+LINE1:PowerMax#0000FF33:"Max" \
+LINE1:Power#0000FF:"Average"
+
+# Optionally create JSON ish format output in the $WEBROOT/data directory
+
+cd $DATADIR
+rrdtool xport --start end-7d --end now --maxrows 800 --json --enumds \
+DEF:Power=powertemp.rrd:Power:AVERAGE:step=6 \
+DEF:PowerMin=powertemp.rrd:Power:MIN:step=6 \
+DEF:PowerMax=powertemp.rrd:Power:MAX:step=6 \
+CDEF:PowerRange=PowerMax,PowerMin,- \
+XPORT:Power:"Average Power" \
+XPORT:PowerMin:"Minimum Power" \
+XPORT:PowerMax:"Maximum Power" \
+XPORT:PowerRange:"Power Range" |sed -e "s/'/\"/g" -e 's/, /],[/g' > /$WEBROOT/data/last_week.json

@@ -1,0 +1,26 @@
+#!/bin/bash
+# Script to produce a graph of temperature
+# over the last day
+
+# Change Variables to reflect your environment
+
+WEBROOT=/var/www
+DATADIR=/home/pi/currentcost/data
+
+# Create Graph in the $WEBROOT/graphs directory
+
+cd $DATADIR
+rrdtool graph /$WEBROOT/graphs/templast_day.png \
+--start end-1d --width 800 --end now --slope-mode \
+--vertical-label "Temp oC"  --lower-limit 0 \
+--height 450 \
+--alt-autoscale-max \
+DEF:Temp=powertemp.rrd:Temperature:AVERAGE:step=6 \
+LINE1:Temp#0000FF:"Temp"
+
+# Optionally create JSON ish format output in the $WEBROOT/data directory
+
+cd $DATADIR
+rrdtool xport --start end-1d --end now --maxrows 800 --json --enumds \
+DEF:Temp=powertemp.rrd:Temperature:AVERAGE:step=6 \
+XPORT:Temp:"Temperature" |sed -e "s/'/\"/g" -e 's/, /],[/g' > /$WEBROOT/data/templast_day.json

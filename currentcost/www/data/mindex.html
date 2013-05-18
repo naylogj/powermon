@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html class="ui-mobile"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script async="" src="./nowlive_files/yql"></script><!--<base href="http://testtocker.azurewebsites.net/nowlive.html">--><base href="."> 
+	<title>My Page</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css">
+	<script src="./nowlive_files/jquery-1.8.2.min.js"></script>
+	<script src="./nowlive_files/jquery.mobile-1.2.0.min.js"></script>
+
+    <link rel="stylesheet" href="./nowlive_files/jgauge.css" type="text/css">
+    <!--[if IE]><script type="text/javascript" language="javascript" src="js/excanvas.min.js"></script><![endif]-->
+    <script language="javascript" type="text/javascript" src="./nowlive_files/jQueryRotate.min.js"></script>
+    <script language="javascript" type="text/javascript" src="./nowlive_files/jgauge-0.3.0.a3.js"></script> 
+</head> 
+<body class="ui-mobile-viewport ui-overlay-c"> 
+
+<div data-role="page" data-url="/data/index.html" tabindex="0" class="ui-page ui-body-c ui-page-active" style="min-height: 782px; ">
+
+	<div data-role="header" class="ui-header ui-bar-a" role="banner">
+		<h1 class="ui-title" role="heading" aria-level="1">Live Electricity and Temperature Details</h1>
+	</div><!-- /header -->
+
+	<div data-role="content" class="ui-content" role="main">	
+		<div id="jGaugeDemo" class="jgauge" style="width: 170px; height: 170px; background-image: url(http://testtocker.azurewebsites.net/img/jgauge_face_taco.png); z-index: 0; "><canvas id="jGaugeDemo-canvas-ranges" width="170" height="170" style="z-index: 1; "></canvas><canvas id="jGaugeDemo-canvas-ticks" width="170" height="170" style="z-index: 2; "></canvas><p class="tick-label" style="left: 28px; top: 112px; color: rgb(0, 204, 238); display: block; z-index: 3; ">0</p><p class="tick-label" style="left: 15px; top: 80px; color: rgb(0, 204, 238); display: block; z-index: 3; ">667</p><p class="tick-label" style="left: 28px; top: 48px; color: rgb(0, 204, 238); display: block; z-index: 3; ">1k</p><p class="tick-label" style="left: 60px; top: 35px; color: rgb(0, 204, 238); display: block; z-index: 3; ">2k</p><p class="tick-label" style="left: 92px; top: 48px; color: rgb(0, 204, 238); display: block; z-index: 3; ">3k</p><p class="tick-label" style="left: 105px; top: 80px; color: rgb(0, 204, 238); display: block; z-index: 3; ">3k</p><p class="tick-label" style="left: 92px; top: 112px; color: rgb(0, 204, 238); display: block; z-index: 3; ">4k</p><p id="jGaugeDemo-label" class="label" style="left: 0px; top: 132px; color: rgb(255, 255, 255); display: block; z-index: 4; "><strong>859</strong> W</p><img id="jGaugeDemo-needle" class="needle" src="./nowlive_files/jgauge_needle_taco.png" style="display: inline-block; z-index: 5; -webkit-transform: rotate(-167deg); position: absolute; left: 0px; top: 0px; "></div> <p></p><br><br><br><br><br><br><br><br><br><br><br>
+        <div id="temp" style="font-size:larger;color:#00a9ff"> 20.6 
+  C</div>
+	</div><!-- /content -->
+
+</div><!-- /page -->
+
+
+
+    <script type="text/javascript">
+        var myGauge = new jGauge(); // Create a new jGauge.
+        myGauge.id = 'jGaugeDemo'; // Link the new jGauge to the placeholder DIV.
+        myGauge.imagePath = 'img/jgauge_face_taco.png';
+        myGauge.segmentStart = -225
+        myGauge.segmentEnd = 45
+        myGauge.width = 170;
+        myGauge.height = 170;
+        myGauge.needle.imagePath = 'img/jgauge_needle_taco.png';
+        myGauge.needle.xOffset = 0;
+        myGauge.needle.yOffset = 0;
+        myGauge.label.yOffset = 55;
+        myGauge.label.color = '#fff';
+        myGauge.label.precision = 0; // 0 decimals (whole numbers).
+        myGauge.label.suffix = 'W'; // Make the value label watts.
+        myGauge.ticks.labelRadius = 45;
+        myGauge.ticks.labelColor = '#0ce';
+        myGauge.ticks.start = 0;
+        myGauge.ticks.end = 4000;
+        myGauge.ticks.count = 7;
+        myGauge.ticks.color = 'rgba(0, 0, 0, 0)';
+        myGauge.range.color = 'rgba(0, 0, 0, 0)';
+        // This function is called by jQuery once the page has finished loading.
+
+        function SetDials() {
+            $.ajax({
+                url: 'http://pint1.servebeer.com/data/inst.json',
+                type: 'GET',
+                success: function (res) {
+                    //alert(res);
+                    arr = res.replace("[", "").replace("]", "").replace("[", "").replace("]", "").split(",");
+                    myGauge.setValue(parseFloat(arr[0]));
+                    $("#temp").html(arr[1] + "C");
+                }
+            });
+        }
+
+        function SetDials2() {
+            var url = "http://pint1.servebeer.com/data/inst.json";
+            jql = "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22" + encodeURIComponent(url) + "%22&format=json'&callback=?"
+            $.getJSON(jql,
+                function (data) {
+                    dave = $(data.results[0]);
+                    res = dave.text();
+                    arr = res.replace("[", "").replace("]", "").replace("[", "").replace("]", "").split(",");
+                    myGauge.setValue(parseFloat(arr[0]));
+                    $("#temp").html(arr[1] + "C");
+                }
+              );
+        }
+
+
+        $(document).ready(function () {
+            myGauge.init(); // Put the jGauge on the page by initialising it.
+            SetDials2();
+            setInterval(SetDials2, 6000);
+        });
+ </script> 
+
+
+<div class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon ui-icon-loading"></span><h1>loading</h1></div></body></html>

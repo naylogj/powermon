@@ -1,0 +1,7 @@
+# m h  dom mon dow      command
+5,15,25,35,45 * * * *   /home/pi/currentcost/bin/10min_graph 1>/dev/null  2>/dev/null    # create 10min graph
+7   *  *   *    *	/home/pi/currentcost/bin/hourly_graph 1>/dev/null 2>/dev/null    # create hourly graph
+3   *  *   *    *       /home/pi/currentcost/bin/4hourly_graph 1>/dev/null 2>/dev/null   # create 4 hourly gr.
+0   7  *   *    *       /home/pi/currentcost/bin/daily_graph 1>/dev/null  2>/dev/null    # create daily graph 
+55  6  *   *    *       /home/pi/currentcost/bin/weekly_graph 1>/dev/null 2>/dev/null    # create weekly graph
+01 7,21 *  *    *       /home/pi/currentcost/bin/dailytemp_graph 1>/dev/null 2>/dev/null # create temp graph

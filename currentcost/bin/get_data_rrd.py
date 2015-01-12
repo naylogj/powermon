@@ -53,8 +53,12 @@ while 1:
 			continue  # if we get a corrupted XML line then ignore and continue (wait for next one)
 
 		# get the temperature <tmpr>
-		xmlTagTemp = dom.getElementsByTagName('tmpr')[0].toxml()
-		xmlDataTemp = xmlTagTemp.replace('<tmpr>','').replace('</tmpr>','')
+		try:
+			xmlTagTemp = dom.getElementsByTagName('tmpr')[0].toxml()
+			xmlDataTemp = xmlTagTemp.replace('<tmpr>','').replace('</tmpr>','')
+		except:
+			xmlDataTemp = "0"
+			
 		if DEBUG: print "Temperature = " + xmlDataTemp + "\n";
 
 		# get channel 2 and then the watts
